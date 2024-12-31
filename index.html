@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<!--
+Copyright 2024 zzhougy
+新年倒计时界面
+-->
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新年倒计时</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-glow: conic-gradient(
+                from 180deg at 50% 50%,
+                #16abff33 0deg,
+                #0885ff33 55deg,
+                #54d6ff33 120deg,
+                #0071ff33 160deg,
+                transparent 360deg
+            );
+            --secondary-glow: radial-gradient(
+                rgba(255, 255, 255, 1),
+                rgba(255, 255, 255, 0)
+            );
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(-45deg, #1a237e, #311b92, #004d40, #1a237e);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            overflow: hidden;
+            color: #fff;
+            perspective: 1000px;
+        }
+
+        .background-effects {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .light-beam {
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.5), transparent);
+            animation: beam-move 8s linear infinite;
+            transform-origin: 50% 0%;
+            opacity: 0;
+        }
+
+        @keyframes beam-move {
+            0% {
+                transform: translateX(-100%) rotate(45deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateX(200%) rotate(45deg);
+                opacity: 0;
+            }
+        }
+
+        .glow-sphere {
+            position: absolute;
+            width: 150vw;
+            height: 150vh;
+            top: -25vh;
+            left: -25vw;
+            background: var(--primary-glow);
+            animation: sphere-rotate 20s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes sphere-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .countdown-container {
+            text-align: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            transform-style: preserve-3d;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 3.5em;
+            margin-bottom: 60px;
+            font-weight: 700;
+            background: linear-gradient(120deg, #ff6b6b, #ffd93d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: inline-block;
+        }
+
+        @keyframes titleFloat {
+            0%, 100% { transform: translateY(0) rotateX(0); }
+            50% { transform: translateY(-10px) rotateX(5deg); }
+        }
+
+        h1::after {
+            content: "2025";
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8em;
+            background: linear-gradient(120deg, #ffd93d, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            white-space: nowrap;
+            animation: shine 2s ease-in-out infinite;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-shadow: 0 2px 5px rgba(255, 217, 61, 0.3),
+            0 5px 10px rgba(255, 107, 107, 0.2);
+        }
+
+        @keyframes shine {
+            0%, 100% {
+                opacity: 0.9;
+                transform: translateX(-50%) scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: translateX(-50%) scale(1.1);
+                text-shadow: 0 2px 10px rgba(255, 217, 61, 0.5),
+                0 5px 15px rgba(255, 107, 107, 0.3);
+            }
+        }
+
+        #countdown {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            transform-style: preserve-3d;
+        }
+
+        .time-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: blockFloat 4s ease-in-out infinite;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .time-block:hover {
+            transform: scale(1.1) translateZ(30px);
+        }
+
+        .time-block:nth-child(2) { animation-delay: 0.5s; }
+        .time-block:nth-child(3) { animation-delay: 1s; }
+        .time-block:nth-child(4) { animation-delay: 1.5s; }
+
+        @keyframes blockFloat {
+            0%, 100% { transform: translateZ(0) translateY(0); }
+            50% { transform: translateZ(20px) translateY(-10px); }
+        }
+
+        .time-value {
+            font-size: 4.5em;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px 30px;
+            border-radius: 20px;
+            min-width: 120px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 2px;
+            transform-style: preserve-3d;
+        }
+
+        .time-value::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                    120deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.2),
+                    transparent
+            );
+            transition: 0.5s;
+        }
+
+        .time-value::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.2) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            border-radius: 20px;
+            mix-blend-mode: overlay;
+        }
+
+        .time-value:hover::before {
+            left: 100%;
+        }
+
+        .time-value:hover::after {
+            opacity: 1;
+        }
+
+        .time-label {
+            font-size: 1.3em;
+            margin-top: 15px;
+            font-weight: 400;
+            background: linear-gradient(120deg, #ffffff, #ffd93d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            animation: labelPulse 2s ease-in-out infinite;
+            position: relative;
+        }
+
+        .time-unit {
+            font-size: 1.8em;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 5px;
+            font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        @keyframes labelPulse {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        @keyframes float-up {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .stars {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -2;
+        }
+
+        .star {
+            position: absolute;
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite;
+            opacity: 0;
+            background: radial-gradient(circle at center, white 0%, transparent 70%);
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 0.8; transform: scale(1); }
+        }
+
+        .message {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2em;
+            text-align: center;
+            width: 100%;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            animation: messageGlow 3s ease-in-out infinite;
+            z-index: 2;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            padding: 15px 0;
+            backdrop-filter: blur(5px);
+        }
+
+        @keyframes messageGlow {
+            0%, 100% { text-shadow: 0 2px 4px rgba(0,0,0,0.1); opacity: 0.8; }
+            50% { text-shadow: 0 0 10px rgba(255,255,255,0.5); opacity: 1; }
+        }
+
+        .background-clock {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            pointer-events: none;
+            z-index: -1;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+        }
+
+        .clock-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+
+        .clock-mark {
+            position: absolute;
+            width: 2px;
+            height: 15px;
+            background: rgba(255, 255, 255, 0.4);
+            left: 50%;
+            transform-origin: 0 300px;
+        }
+
+        .clock-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            z-index: 4;
+        }
+
+        .clock-hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: 50% 100%;
+        }
+
+        .hours-hand {
+            width: 4px;
+            height: 150px;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.3));
+            z-index: 1;
+        }
+
+        .minutes-hand {
+            width: 3px;
+            height: 200px;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.3));
+            z-index: 2;
+        }
+
+        .seconds-hand {
+            width: 2px;
+            height: 250px;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.4));
+            z-index: 3;
+        }
+
+        .final-countdown {
+            animation: finalPulse 1s ease-in-out infinite;
+            color: #ff3860;
+            font-size: 8em !important;
+            text-shadow: 0 0 20px rgba(255, 23, 68, 0.9);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+        }
+
+        .final-countdown .clock-mark {
+            left: 47% !important;
+            transform-origin: 0 300px !important;
+        }
+
+        @media (max-width: 768px) {
+            .final-countdown {
+                transform: scale(1.1) !important;
+            }
+
+            .final-countdown .clock-mark {
+                left: 47% !important;
+                transform-origin: 0 150px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .final-countdown .clock-mark {
+                left: 47% !important;
+                transform-origin: 0 100px !important;
+            }
+        }
+
+        .background-clock.final-countdown {
+            border-color: rgba(255, 56, 96, 0.3);
+            animation: clockPulse 1s ease-in-out infinite;
+        }
+
+        .final-countdown .clock-hand {
+            background: linear-gradient(to top, rgba(255, 56, 96, 0.5), transparent);
+        }
+
+        .final-countdown .clock-center {
+            background: rgba(255, 56, 96, 0.5);
+            box-shadow: 0 0 30px rgba(255, 56, 96, 0.5);
+        }
+
+        @keyframes finalPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes clockPulse {
+            0%, 100% { 
+                transform: translate(-50%, -50%) scale(1);
+                box-shadow: 0 0 50px rgba(255, 56, 96, 0.2);
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.05);
+                box-shadow: 0 0 100px rgba(255, 56, 96, 0.4);
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+                margin-bottom: 40px;
+            }
+
+            h1::after {
+                font-size: 0.7em;
+                bottom: -30px;
+            }
+
+            #countdown {
+                gap: 15px;
+                padding: 0 10px;
+            }
+
+            .time-block {
+                transform: none !important;
+                animation: none !important;
+            }
+
+            .time-value {
+                font-size: 2.5em;
+                min-width: 60px;
+                padding: 15px;
+            }
+
+            .time-unit {
+                font-size: 1.2em;
+            }
+
+            .background-clock {
+                width: 300px;
+                height: 300px;
+                opacity: 0.3;
+            }
+
+            .clock-mark {
+                left: 50%;
+                transform-origin: 0 150px;
+            }
+
+            .hours-hand {
+                height: 80px;
+            }
+
+            .minutes-hand {
+                height: 100px;
+            }
+
+            .seconds-hand {
+                height: 120px;
+            }
+
+            .message {
+                font-size: 1em;
+                padding: 10px 20px;
+                bottom: 20px;
+            }
+
+            .glow-sphere {
+                opacity: 0.2;
+            }
+
+            .final-countdown {
+                font-size: 4em !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .time-value {
+                font-size: 2em;
+                min-width: 50px;
+                padding: 12px;
+            }
+
+            .time-unit {
+                font-size: 1em;
+            }
+
+            .background-clock {
+                width: 200px;
+                height: 200px;
+            }
+
+            .clock-mark {
+                transform-origin: 0 100px;
+            }
+
+            .hours-hand {
+                height: 60px;
+            }
+
+            .minutes-hand {
+                height: 80px;
+            }
+
+            .seconds-hand {
+                height: 90px;
+            }
+        }
+
+        /* 添加震动动画 */
+        @keyframes shake {
+            0%, 100% { 
+                transform: translate(-50%, -50%) scale(1);
+            }
+            10%, 30%, 50%, 70%, 90% { 
+                transform: translate(-52%, -50%) scale(1);
+            }
+            20%, 40%, 60%, 80% { 
+                transform: translate(-48%, -50%) scale(1);
+            }
+        }
+
+        @keyframes shakeMobile {
+            0%, 100% { 
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            10%, 30%, 50%, 70%, 90% { 
+                transform: translate(-52%, -50%) scale(1.1);
+            }
+            20%, 40%, 60%, 80% { 
+                transform: translate(-48%, -50%) scale(1.1);
+            }
+        }
+
+        @keyframes shakeSmall {
+            0%, 100% { 
+                transform: translate(-50%, -50%) scale(1);
+            }
+            10%, 30%, 50%, 70%, 90% { 
+                transform: translate(-52%, -50%) scale(1);
+            }
+            20%, 40%, 60%, 80% { 
+                transform: translate(-48%, -50%) scale(1);
+            }
+        }
+
+        .background-clock.final-countdown {
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            border-color: rgba(255, 56, 96, 0.3);
+            z-index: 999 !important;
+            animation: clockPulse 1s ease-in-out infinite !important;
+        }
+
+        .shaking .background-clock.final-countdown {
+            animation: shake 0.5s ease-in-out infinite !important;
+        }
+
+        @media (max-width: 768px) {
+            .background-clock {
+                width: 300px;
+                height: 300px;
+                opacity: 0.3;
+            }
+
+            .background-clock.final-countdown {
+                width: 300px !important;
+                height: 300px !important;
+                opacity: 1 !important;
+            }
+
+            .shaking .background-clock.final-countdown {
+                animation: shakeMobile 0.5s ease-in-out infinite !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .background-clock {
+                width: 200px;
+                height: 200px;
+            }
+
+            .background-clock.final-countdown {
+                width: 200px !important;
+                height: 200px !important;
+            }
+
+            .shaking .background-clock.final-countdown {
+                animation: shakeSmall 0.5s ease-in-out infinite !important;
+            }
+        }
+
+        @keyframes clockPulse {
+            0%, 100% { 
+                transform: translate(-50%, -50%) scale(1);
+                box-shadow: 0 0 50px rgba(255, 56, 96, 0.2);
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.05);
+                box-shadow: 0 0 100px rgba(255, 56, 96, 0.4);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-effects">
+        <div class="glow-sphere"></div>
+        <div class="background-clock">
+            <div class="clock-face">
+                <div class="clock-mark" style="transform: rotate(0deg)"></div>
+                <div class="clock-mark" style="transform: rotate(30deg)"></div>
+                <div class="clock-mark" style="transform: rotate(60deg)"></div>
+                <div class="clock-mark" style="transform: rotate(90deg)"></div>
+                <div class="clock-mark" style="transform: rotate(120deg)"></div>
+                <div class="clock-mark" style="transform: rotate(150deg)"></div>
+                <div class="clock-mark" style="transform: rotate(180deg)"></div>
+                <div class="clock-mark" style="transform: rotate(210deg)"></div>
+                <div class="clock-mark" style="transform: rotate(240deg)"></div>
+                <div class="clock-mark" style="transform: rotate(270deg)"></div>
+                <div class="clock-mark" style="transform: rotate(300deg)"></div>
+                <div class="clock-mark" style="transform: rotate(330deg)"></div>
+            </div>
+            <div class="clock-center"></div>
+            <div class="clock-hand hours-hand"></div>
+            <div class="clock-hand minutes-hand"></div>
+            <div class="clock-hand seconds-hand"></div>
+        </div>
+    </div>
+    <div class="stars"></div>
+    <div class="particles"></div>
+    <div class="countdown-container">
+        <h1>新年倒计时</h1>
+        <div id="countdown">
+            <div class="time-block">
+                <div class="time-value" id="days">00</div>
+                <div class="time-unit">天</div>
+            </div>
+            <div class="time-block">
+                <div class="time-value" id="hours">00</div>
+                <div class="time-unit">时</div>
+            </div>
+            <div class="time-block">
+                <div class="time-value" id="minutes">00</div>
+                <div class="time-unit">分</div>
+            </div>
+            <div class="time-block">
+                <div class="time-value" id="seconds">00</div>
+                <div class="time-unit">秒</div>
+            </div>
+        </div>
+    </div>
+    <div class="message">期待与你共同迎接2025年的第一缕阳光</div>
+
+    <script>
+        // 创建星星背景
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            const starCount = 100;
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                // 随机大小和位置
+                const size = Math.random() * 3 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                // 随机动画持续时间
+                const duration = Math.random() * 3 + 2;
+                star.style.setProperty('--duration', `${duration}s`);
+                
+                // 随机延迟开始时间
+                star.style.animationDelay = `${Math.random() * 3}s`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // 创建浮动粒子效果
+        function createParticles() {
+            const particlesContainer = document.querySelector('.particles');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+
+                    const size = Math.random() * 5 + 3;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${Math.random() * 100}%`;
+
+                    // 添加闪光效果
+                    particle.style.boxShadow = `0 0 ${Math.random() * 5 + 5}px rgba(255,255,255,0.8)`;
+                    particle.style.animation = `float-up ${Math.random() * 3 + 2}s linear`;
+
+                    particlesContainer.appendChild(particle);
+
+                    particle.addEventListener('animationend', () => {
+                        particle.remove();
+                    });
+                }, i * 100);
+            }
+        }
+
+        // 创建光束效果
+        function createLightBeams() {
+            const effects = document.querySelector('.background-effects');
+            const beamCount = 5;
+
+            for (let i = 0; i < beamCount; i++) {
+                const beam = document.createElement('div');
+                beam.className = 'light-beam';
+                beam.style.left = `${Math.random() * 100}%`;
+                beam.style.animationDelay = `${Math.random() * 8}s`;
+                effects.appendChild(beam);
+            }
+        }
+
+        // 初始化视觉效果
+        createStars();
+        createLightBeams();
+        setInterval(createParticles, 2000);
+
+        const newYear = new Date('January 1, 2025 00:00:00').getTime();
+        const now = new Date().getTime();
+        let virtualNow = now;
+        // let virtualNow = new Date('December 31, 2024 23:59:48').getTime();
+
+        function countdown() {
+            let distance = newYear - virtualNow;
+
+            if (distance < 0) {
+                window.location.href = 'firework.html';
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // 检查是否进入最后10秒
+            const isLastTenSeconds = days === 0 && hours === 0 && minutes === 0 && seconds <= 10;
+            const clockElement = document.querySelector('.background-clock');
+            const secondsElement = document.getElementById('seconds');
+            
+            if (isLastTenSeconds) {
+                clockElement.classList.add('final-countdown');
+                secondsElement.classList.add('final-countdown');
+                
+                // 添加震动效果
+                if (!clockElement.classList.contains('shaking')) {
+                    clockElement.classList.add('shaking');
+                }
+            } else {
+                clockElement.classList.remove('final-countdown');
+                secondsElement.classList.remove('final-countdown');
+                clockElement.classList.remove('shaking');
+            }
+
+            updateWithAnimation('days', days);
+            updateWithAnimation('hours', hours);
+            updateWithAnimation('minutes', minutes);
+            updateWithAnimation('seconds', seconds);
+
+            // 更新时钟显示
+            const currentTime = new Date(virtualNow);
+            updateClock(currentTime.getHours(), currentTime.getMinutes(), currentTime.getSeconds());
+
+            virtualNow += 1000;
+        }
+
+        function updateWithAnimation(elementId, value) {
+            const element = document.getElementById(elementId);
+            const currentValue = parseInt(element.textContent);
+            const newValue = value.toString().padStart(2, '0');
+
+            if (currentValue !== value) {
+                element.style.transform = 'scale(1.1) translateZ(20px)';
+                element.style.boxShadow = '0 15px 35px rgba(255,255,255,0.2)';
+                element.textContent = newValue;
+
+                setTimeout(() => {
+                    element.style.transform = 'scale(1) translateZ(0)';
+                    element.style.boxShadow = '0 8px 32px rgba(0,0,0,0.1)';
+                }, 100);
+            }
+        }
+
+        function updateClock(hours, minutes, seconds) {
+            const hoursHand = document.querySelector('.hours-hand');
+            const minutesHand = document.querySelector('.minutes-hand');
+            const secondsHand = document.querySelector('.seconds-hand');
+
+            // 计算角度：
+            // 时针：每小时转30度(360/12)，分钟需要加上偏移量
+            // 分针：每分钟转6度(360/60)
+            // 秒针：每秒转6度(360/60)
+            const hoursAngle = (hours * 30) + (minutes * 0.5); // 0.5 = 30/60
+            const minutesAngle = minutes * 6;
+            const secondsAngle = seconds * 6;
+
+            // 使用 rotate 来旋转指针，角度为正值代表顺时针旋转
+            hoursHand.style.transform = `rotate(${hoursAngle}deg)`;
+            minutesHand.style.transform = `rotate(${minutesAngle}deg)`;
+            secondsHand.style.transform = `rotate(${secondsAngle}deg)`;
+        }
+
+        // 添加鼠标移动视差效果
+        document.addEventListener('mousemove', (e) => {
+            const { clientX, clientY } = e;
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            
+            const moveX = (clientX - centerX) / centerX;
+            const moveY = (clientY - centerY) / centerY;
+            
+            document.querySelector('.countdown-container').style.transform = 
+                `translate(-50%, -50%) rotateX(${moveY * 5}deg) rotateY(${moveX * 5}deg)`;
+        });
+
+        setInterval(countdown, 1000);
+        countdown();
+
+        document.addEventListener('visibilitychange', function () {
+            if (document.hidden) {
+                document.title = '新年倒计时 | 等你回来~';
+            } else {
+                document.title = '新年倒计时';
+                virtualNow = new Date().getTime();
+                countdown();
+            }
+        });
+    </script>
+</body>
+</html>
