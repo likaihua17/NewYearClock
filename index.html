@@ -739,7 +739,7 @@ Copyright 2024 zzhougy
                 star.className = 'star';
                 
                 // 随机大小和位置
-                const size = Math.random() * 20 + 5;
+                const size = Math.random() * 5 + 3;
                 star.style.width = `${size}px`;
                 star.style.height = `${size}px`;
                 star.style.left = `${Math.random() * 100}%`;
@@ -751,7 +751,7 @@ Copyright 2024 zzhougy
                 star.style.setProperty('--duration', `${duration}s`);
                 
                 // 随机延迟开始时间
-                star.style.animationDelay = `${Math.random() * 3}s`;
+                // star.style.animationDelay = `${Math.random() * 3}s`;
 
                 starsContainer.appendChild(star);
             }
@@ -771,6 +771,7 @@ Copyright 2024 zzhougy
                     particle.style.width = `${size}px`;
                     particle.style.height = `${size}px`;
                     particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.top = `${Math.random() * 100}%`;
 
                     // 添加闪光效果
                     particle.style.boxShadow = `0 0 ${Math.random() * 5 + 5}px rgba(255,255,255,0.8)`;
@@ -801,7 +802,7 @@ Copyright 2024 zzhougy
 
         // 初始化视觉效果
         createStars();
-        // createLightBeams(); // 假流星不好看
+        createLightBeams();
         setInterval(createParticles, 2000);
 
         const newYear = new Date('January 1, 2025 00:00:00').getTime();
