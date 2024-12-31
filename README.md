@@ -2,7 +2,7 @@
 
 实现新年倒计时后放烟花的效果
 
-预览地址：https://likaihua17.github.io/NewYearFireworks/
+预览地址：https://likaihua17.github.io/NewYearClock
 
 ![image.png](assets/img_1.png)
 
