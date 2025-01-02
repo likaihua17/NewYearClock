@@ -53,7 +53,7 @@ Copyright 2024 zzhougy
             width: 2px;
             height: 100%;
             background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.5), transparent);
-            animation: beam-move 8s linear infinite;
+            animation: beam-move 10s linear infinite;
             transform-origin: 50% 0%;
             opacity: 0;
         }
@@ -466,11 +466,11 @@ Copyright 2024 zzhougy
         }
 
         @keyframes clockPulse {
-            0%, 100% { 
+            0%, 100% {
                 transform: translate(-50%, -50%) scale(1);
                 box-shadow: 0 0 50px rgba(255, 56, 96, 0.2);
             }
-            50% { 
+            50% {
                 transform: translate(-50%, -50%) scale(1.05);
                 box-shadow: 0 0 100px rgba(255, 56, 96, 0.4);
             }
@@ -584,37 +584,37 @@ Copyright 2024 zzhougy
 
         /* 添加震动动画 */
         @keyframes shake {
-            0%, 100% { 
+            0%, 100% {
                 transform: translate(-50%, -50%) scale(1);
             }
-            10%, 30%, 50%, 70%, 90% { 
+            10%, 30%, 50%, 70%, 90% {
                 transform: translate(-52%, -50%) scale(1);
             }
-            20%, 40%, 60%, 80% { 
+            20%, 40%, 60%, 80% {
                 transform: translate(-48%, -50%) scale(1);
             }
         }
 
         @keyframes shakeMobile {
-            0%, 100% { 
+            0%, 100% {
                 transform: translate(-50%, -50%) scale(1.1);
             }
-            10%, 30%, 50%, 70%, 90% { 
+            10%, 30%, 50%, 70%, 90% {
                 transform: translate(-52%, -50%) scale(1.1);
             }
-            20%, 40%, 60%, 80% { 
+            20%, 40%, 60%, 80% {
                 transform: translate(-48%, -50%) scale(1.1);
             }
         }
 
         @keyframes shakeSmall {
-            0%, 100% { 
+            0%, 100% {
                 transform: translate(-50%, -50%) scale(1);
             }
-            10%, 30%, 50%, 70%, 90% { 
+            10%, 30%, 50%, 70%, 90% {
                 transform: translate(-52%, -50%) scale(1);
             }
-            20%, 40%, 60%, 80% { 
+            20%, 40%, 60%, 80% {
                 transform: translate(-48%, -50%) scale(1);
             }
         }
@@ -668,11 +668,11 @@ Copyright 2024 zzhougy
         }
 
         @keyframes clockPulse {
-            0%, 100% { 
+            0%, 100% {
                 transform: translate(-50%, -50%) scale(1);
                 box-shadow: 0 0 50px rgba(255, 56, 96, 0.2);
             }
-            50% { 
+            50% {
                 transform: translate(-50%, -50%) scale(1.05);
                 box-shadow: 0 0 100px rgba(255, 56, 96, 0.4);
             }
@@ -737,7 +737,7 @@ Copyright 2024 zzhougy
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
-                
+
                 // 随机大小和位置
                 const rand = Math.random()
                 const size = rand * 5 + 5;
@@ -745,12 +745,12 @@ Copyright 2024 zzhougy
                 star.style.height = `${size}px`;
                 star.style.left = `${Math.random() * 100}%`;
                 star.style.top = `${Math.random() * 100}%`;
-                
+
                 // 随机动画持续时间
                 // const duration = Math.random() * 3 + 2;
                 const duration = rand * 2 + 2;
                 star.style.setProperty('--duration', `${duration}s`);
-                
+
                 // 随机延迟开始时间
                 // star.style.animationDelay = `${Math.random() * 3}s`;
 
@@ -830,11 +830,11 @@ Copyright 2024 zzhougy
             const isLastTenSeconds = days === 0 && hours === 0 && minutes === 0 && seconds <= 10;
             const clockElement = document.querySelector('.background-clock');
             const secondsElement = document.getElementById('seconds');
-            
+
             if (isLastTenSeconds) {
                 clockElement.classList.add('final-countdown');
                 secondsElement.classList.add('final-countdown');
-                
+
                 // 添加震动效果
                 if (!clockElement.classList.contains('shaking')) {
                     clockElement.classList.add('shaking');
@@ -898,11 +898,11 @@ Copyright 2024 zzhougy
             const { clientX, clientY } = e;
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
-            
+
             const moveX = (clientX - centerX) / centerX;
             const moveY = (clientY - centerY) / centerY;
-            
-            document.querySelector('.countdown-container').style.transform = 
+
+            document.querySelector('.countdown-container').style.transform =
                 `translate(-50%, -50%) rotateX(${moveY * 5}deg) rotateY(${moveX * 5}deg)`;
         });
 
